@@ -20,11 +20,13 @@
 # 
 # skxplore considers the following algorithms:<br>
 # 1. Classification<br>
-# `Naive Bayes algorithm`, `K-nearest neighbors algorithm`, `Support vector machine classifier`, `eXtreme gradient boosting classifier`, and `Light gradient boosting machine classifier`
+# &nbsp;&nbsp;&nbsp;&nbsp;`Naive Bayes algorithm`, `K-nearest neighbors algorithm`, `Support vector machine classifier`, `eXtreme gradient boosting classifier`, and `Light gradient boosting machine classifier`
 # 2. Regression<br>
-# `Lasso regression`, `Ridge regression`, `Elastic net regression`, `Linear regression`, `Support vector machine regressor`, `eXtreme gradient boosting regressor`, and `Light gradient boosting machine regressor`
+# &nbsp;&nbsp;&nbsp;&nbsp;`Lasso regression`, `Ridge regression`, `Elastic net regression`, `Linear regression`, `Support vector machine regressor`, `eXtreme gradient boosting regressor`, and `Light gradient boosting machine regressor`
 # 3. Clustering<br>
-# `K-means clustering`, `Spectral clustering`, `Gaussian mixture model`, `Density-based spatial clustering of applications with noise (DBSCAN) algorithm`, and `Ordering points to identify the clustering structure (OPTICS) algorithm`
+# &nbsp;&nbsp;&nbsp;&nbsp;`K-means clustering`, `Spectral clustering`, `Gaussian mixture model`, `Density-based spatial clustering of applications with noise (DBSCAN) algorithm`, and `Ordering points to identify the clustering structure (OPTICS) algorithm`
+
+# In[1]:
 
 
 # Importing the preprocessing libraries
@@ -63,17 +65,24 @@ import numpy as np
 import matplotlib.animation as animation
 
 
+# In[2]:
+
+
 def find_model(dataset, train_size, problem, label="", datatype="numerical",
                dim_reduction=False, components="auto", contains_negative=True, ensembling=True, priority="accuracy"):
-    if datatype == "numerical" and problem == "classification":
+    if datatype != "nominal":
         # Label encode data to ensure everything is numeric
         print("Label encoding. . .")
         dataset = dataset.apply(LabelEncoder().fit_transform)
     
     # Splitting the dataset into the features and label
-    print("Identifying feature columns and label column. . .")
-    X = dataset[dataset.columns.difference([label])] #features
-    y = dataset[label] #label
+    if problem != "clustering":
+        print("Identifying feature columns and label column. . .")
+        X = dataset[dataset.columns.difference([label])] #features
+        y = dataset[label] #label
+    else:
+        print("Clustering problem detected, skipping label column identification. . .")
+        X = dataset
     
     if datatype == "nominal" and problem == "classification":
         if dim_reduction:
@@ -108,23 +117,28 @@ def find_model(dataset, train_size, problem, label="", datatype="numerical",
             X = nmf.fit_transform(X)
         print("Features' shape after reduction is", X.shape)
     
-    # Split X and y into training and testing datasets
-    print("Splitting datasets for training and testing. . .")
-    X_train, X_test, y_train, y_test = train_test_split(X, y, train_size = train_size)
-    
-    # Scale variables to standardize values
-    print("Standardizing values. . .")
-    sc = StandardScaler()
-    X_train = sc.fit_transform(X_train)
-    X_test = sc.transform(X_test)
-    
+    if problem != "clustering":
+        # Split X and y into training and testing datasets
+        print("Splitting datasets for training and testing. . .")
+        X_train, X_test, y_train, y_test = train_test_split(X, y, train_size = train_size)
+        # Scale variables to standardize values
+        print("Standardizing values. . .")
+        sc = StandardScaler()
+        X_train = sc.fit_transform(X_train)
+        X_test = sc.transform(X_test)
+    else:
+        # Scale variables to standardize values
+        print("Standardizing values. . .")
+        sc = StandardScaler()
+        X = sc.fit_transform(X)
+
     if priority == "accuracy":
         if problem == "classification":
             find_classification_model(X_train, X_test, y_train, y_test, priority="accuracy", ensembling=ensembling, datatype=datatype)
         elif problem == "regression":
             find_regression_model(X_train, X_test, y_train, y_test, ensembling=ensembling)
         elif problem == "clustering":
-            find_clustering_model(X, y)
+            find_clustering_model(X)
         
     if priority == "time":
         if problem == "classification":
@@ -132,7 +146,10 @@ def find_model(dataset, train_size, problem, label="", datatype="numerical",
         elif problem == "regression":
             find_regression_model(X_train, X_test, y_train, y_test, ensembling=ensembling)
         elif problem == "clustering":
-            find_clustering_model(X, y)
+            find_clustering_model(X)
+
+
+# In[3]:
 
 
 def find_classification_model(X_train, X_test, y_train, y_test, priority="accuracy", ensembling=True, datatype="numerical"):
@@ -327,6 +344,9 @@ def find_classification_model(X_train, X_test, y_train, y_test, priority="accura
     print("\nWith consideration of", priority, "as the priority, the best model found for classifying the dataset is:\n", best_model)
 
 
+# In[4]:
+
+
 @ignore_warnings(category=ConvergenceWarning)
 @ignore_warnings(category=FutureWarning)
 def find_regression_model(X_train, X_test, y_train, y_test, ensembling=True):
@@ -478,7 +498,10 @@ def find_regression_model(X_train, X_test, y_train, y_test, ensembling=True):
     print("\nThe best model found for the regression problem on the dataset is:\n", best_model)
 
 
-def find_clustering_model(X, y):
+# In[5]:
+
+
+def find_clustering_model(X):
     models = []
     overall_accuracies = []
     overall_labels = []
