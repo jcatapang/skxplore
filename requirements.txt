@@ -2,6 +2,5 @@ pandas
 sklearn
 xgboost
 lightgbm
-mpl_toolkits
 matplotlib
 numpy
