@@ -75,26 +75,6 @@ def find_model(dataset, train_size, problem, label="", datatype="numerical",
         print("Label encoding. . .")
         dataset = dataset.apply(LabelEncoder().fit_transform)
     
-    # Splitting the dataset into the features and label
-    if problem != "clustering":
-        print("Identifying feature columns and label column. . .")
-        X = dataset[dataset.columns.difference([label])] #features
-        y = dataset[label] #label
-    else:
-        print("Clustering problem detected, skipping label column identification. . .")
-        X = dataset
-    
-    if datatype == "nominal" and problem == "classification":
-        if dim_reduction:
-            print("Dimensionality reduction is not supported if your datatype is nominal.")
-            exit()
-        else:
-            print("Applying term frequency inverse document frequency on text. . .")
-            Tfidf_vect = TfidfVectorizer(max_features=2500)
-            Tfidf_vect.fit_transform(X)
-            print("Label encoding. . .")
-            y = y.apply(LabelEncoder().fit_transform)
-    
     # Reduce dimensionality of dataset
     if dim_reduction:
         print("Performing dimensionality reduction. . .")
