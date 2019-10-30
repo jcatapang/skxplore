@@ -9,7 +9,6 @@ The find_model function has the following parameters:<br>
 `train_size` is a float from the interval (0, 1); it defines the partition of the dataset for training and testing<br>
 `problem` has three selections: classification, regression, and clustering<br>
 `label` takes a column name in the pandas dataframe and treats it as the label for classification or the target value for regression<br>
-`datatype` has two types: numerical and nominal (for text classification); numerical by default<br>
 `dim_reduction` takes True or False as its value; it gives the option to apply dimensionality reduction on the dataset; False by default<br>
 `features` is the number of components to remain after dimensionality reduction; auto by default<br>
 `contains_negative` takes True or False as its value; setting its value to True uses principal component analysis, while setting its value to False uses non-negative matrix factorization; True by default<br>
@@ -23,4 +22,3 @@ skxplore considers the following algorithms:<br>
 &nbsp;&nbsp;&nbsp;&nbsp;`Lasso regression`, `Ridge regression`, `Elastic net regression`, `Linear regression`, `Support vector machine regressor`, `eXtreme gradient boosting regressor`, and `Light gradient boosting machine regressor`
 3. Clustering<br>
 &nbsp;&nbsp;&nbsp;&nbsp;`K-means clustering`, `Spectral clustering`, `Gaussian mixture model`, `Density-based spatial clustering of applications with noise (DBSCAN) algorithm`, and `Ordering points to identify the clustering structure (OPTICS) algorithm`
-
